@@ -1,0 +1,3 @@
+display_name: Abaqus ODB Origin Export
+short_description: Export Abaqus ODB seismic results and Origin plotting tables.
+default_prompt: Use this skill to read already-open Abaqus ODB Field Output data or convert postprocess Excel files into Origin-ready CSV/XLSX plotting data with Chinese headers.
