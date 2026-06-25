@@ -100,6 +100,33 @@ Outputs in `Origin_export/`:
 
 All CSV files must be written with `utf-8-sig` encoding so Origin opens Chinese headers correctly.
 
+When generating Origin CSVs by any fallback implementation, preserve each row as one complete
+record. Do not let a two-column row such as `[time, value]` flatten into two separate one-column
+rows. This failure appears in Excel/Origin as a correct header row with missing second-column data.
+
+## Origin Export Integrity Validation
+
+After creating `Origin_export/`, always run:
+
+```bash
+python scripts/validate_origin_export.py <dataset-output-folder>
+```
+
+Use the dataset folder that contains both `*_Time_History.csv` and `Origin_export/`.
+The validator checks:
+
+- Required Origin CSV files exist.
+- Headers match the expected Chinese columns.
+- Every data row has the exact expected column count.
+- Non-label cells are nonblank finite numbers.
+- Fig1-Fig5 row counts match the source `*_Time_History.csv` data row count.
+- `Origin_plot_data.xlsx` exists.
+
+If validation fails, do not report the Origin export as complete. Fix the export and rerun the
+validator. A row-count mismatch of roughly `2x` or `3x`, or rows with only one column under
+two-column/three-column figure headers, means the export code flattened rows and must be rewritten
+to append/write row arrays explicitly.
+
 ## Validation Checklist
 
 After running either workflow, report:
@@ -111,5 +138,8 @@ After running either workflow, report:
 - Row/frame count.
 - Peak values and times.
 - Whether `M_capacity_kN_m` was set; if zero, report `未设置抗倾覆能力`.
+- Origin export validation result from `scripts/validate_origin_export.py`.
+- Confirm that Fig1-Fig5 data row counts equal the source time-history row count and that no
+  Origin figure CSV has one-column data rows under multi-column headers.
 
 If Python is unavailable in the user environment, still provide the script and use available local tools to generate equivalent output only when that does not modify the source Excel or Abaqus model.
